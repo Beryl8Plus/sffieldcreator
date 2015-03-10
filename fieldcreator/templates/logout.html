@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	<div class="inner">
+
+		<h1>Salesforce Field Creator</h1>
+		
+		<p>
+			Successfully logged out of Salesforce and Field Creator
+		</p>
+
+		<iframe src="https://{{ instance_prefix }}.salesforce.com/secur/logout.jsp" width="0" height="0" style="display:none;"></iframe>
+
+		<script>
+			setTimeout(function () {
+	       		window.location.href = "/";
+	    	}, 3000);
+		</script>
+
+	</div>
+{% endblock %} 
