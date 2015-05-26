@@ -64,16 +64,24 @@ def get_metadata(job):
 				custom_object.name = record['name']
 				custom_object.save()
 
-		# Query for all profiles
-		for record in requests.get(request_url + 'tooling/query/?q=Select+Id,Name,FullName+From+Profile', headers = headers).json()['records']:
 
-			profile = Profile()
-			profile.job = job
-			profile.salesforce_id = record['Id']
-			profile.name = record['Name']
-			profile.fullName = record['FullName']
-			profile.save()
+		# Query for profiles in Org
+		profile_query = requests.get(request_url + 'tooling/query/?q=Select+Id,Name,FullName+From+Profile', headers = headers).json()
 
+		# If profiles are found, save thema gainst the job
+		if 'records' in profile_query:
+
+			# Query for all profiles
+			for record in profile_query['records']:
+
+				profile = Profile()
+				profile.job = job
+				profile.salesforce_id = record['Id']
+				profile.name = record['Name']
+				profile.fullName = record['FullName']
+				profile.save()
+
+		# Update Job status to finished
 		job.status = 'Finished'
 
 	except Exception as error:
@@ -156,21 +164,18 @@ def deploy_profiles_async(job, object_name, all_fields):
 					result = metadata_client.service.updateMetadata(profiles_to_deploy)
 
 					# Print result
-					#create_error_log('Deploy Profiles Result', str(result))
+					create_error_log('Deploy Profiles Result', str(result))
 
 					# Capture error if exists
 					if not result[0].success:
 
-						pass
-						#create_error_log('Deploy Profiles Error', str(ex))
+						create_error_log('Deploy Profiles Error', str(ex))
 
 			except Exception as ex:
 
-				pass
-				#create_error_log('Deploy Profiles Error', str(ex))
+				create_error_log('Deploy Profiles Error', str(ex))
 
 	except Exception as ex:
 
-		pass
-		#create_error_log('Deploy Profiles Error', str(ex))
+		create_error_log('Deploy Profiles Error', str(ex))
 
